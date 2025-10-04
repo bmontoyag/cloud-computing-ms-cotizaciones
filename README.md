@@ -2,9 +2,7 @@
 
 ```mermaid
 
-
 erDiagram
-   erDiagram
     PROYECTO {
         string id_proyecto PK
         string id_usuario
