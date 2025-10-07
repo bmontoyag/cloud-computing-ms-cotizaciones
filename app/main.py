@@ -1,7 +1,17 @@
-from fastapi import FastAPI
-from mangum import Mangum
-from app.routes.cotizaciones import router as cot_router
 
-app = FastAPI(title="MS Cotizaciones", version="1.0.0")
-app.include_router(cot_router, prefix="/api/cotizaciones", tags=["Cotizaciones"])
-handler = Mangum(app)
+from fastapi import FastAPI
+from app.db import engine
+from app.models.base import Base
+from app.util.cors import add_cors
+
+app = FastAPI(title="Servicio API")
+
+# Crear tablas (solo demo)
+Base.metadata.create_all(bind=engine)
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+from app.routers import cotizacion
+app.include_router(cotizacion.router)
