@@ -1,12 +1,21 @@
 
 from pydantic import BaseModel
 
-class CotizacionCreate(BaseModel):
+class ProyectoCreate(BaseModel):
+    id_proyecto: str
+    nombre_proyecto: str
     cliente: str
-    proyecto: str
-    total: float = 0.0
+    total_proyecto: float = 0
+    estado: str | None = None
 
-class CotizacionOut(CotizacionCreate):
-    id: int
-    class Config:
-        from_attributes = True
+class ProyectoOut(ProyectoCreate):
+    pass
+
+class PresupuestoCreate(BaseModel):
+    id_presupuesto: str
+    id_proyecto: str
+    nombre_presupuesto: str
+    total_presupuesto: float = 0
+
+class PresupuestoOut(PresupuestoCreate):
+    pass

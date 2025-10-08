@@ -1,9 +1,9 @@
-
+version: '3.9'
 services:
   api:
     build: .
-    container_name: ${SERVICE_NAME:-service}-api
+    container_name: cloud-computing-ms-cotizaciones-api
     env_file: .env
     ports:
-      - "${APP_PORT:-8080}:8080"
+      - "${APP_PORT:-8081}:8081"
     restart: unless-stopped

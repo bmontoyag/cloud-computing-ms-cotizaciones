@@ -1,20 +1,38 @@
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db import get_db
-from app.models.cotizacion import Cotizacion
-from app.schemas.cotizacion import CotizacionCreate, CotizacionOut
+from app.models.cotizacion import Proyecto, Presupuesto
+from app.schemas.cotizacion import (
+    ProyectoCreate, ProyectoOut,
+    PresupuestoCreate, PresupuestoOut,
+)
 
-router = APIRouter(prefix="/cotizaciones", tags=["cotizaciones"])
+router = APIRouter(prefix="/api/cotizaciones", tags=["cotizaciones"])
 
-@router.get("/", response_model=list[CotizacionOut])
-def list_cotizaciones(db: Session = Depends(get_db)):
-    return db.query(Cotizacion).all()
+@router.get("/proyectos", response_model=list[ProyectoOut])
+def list_proyectos(db: Session = Depends(get_db)):
+    return db.query(Proyecto).all()
 
-@router.post("/", response_model=CotizacionOut)
-def create_cotizacion(payload: CotizacionCreate, db: Session = Depends(get_db)):
-    c = Cotizacion(**payload.dict())
-    db.add(c)
+@router.post("/proyectos", response_model=ProyectoOut)
+def create_proyecto(payload: ProyectoCreate, db: Session = Depends(get_db)):
+    exists = db.query(Proyecto).filter_by(id_proyecto=payload.id_proyecto).first()
+    if exists:
+        raise HTTPException(status_code=409, detail="Proyecto ya existe")
+    p = Proyecto(**payload.dict())
+    db.add(p)
     db.commit()
-    db.refresh(c)
-    return c
+    return payload
+
+@router.get("/presupuestos/{id_proyecto}", response_model=list[PresupuestoOut])
+def list_presupuestos(id_proyecto: str, db: Session = Depends(get_db)):
+    return db.query(Presupuesto).filter_by(id_proyecto=id_proyecto).all()
+
+@router.post("/presupuestos", response_model=PresupuestoOut)
+def create_presupuesto(payload: PresupuestoCreate, db: Session = Depends(get_db)):
+    if not db.query(Proyecto).filter_by(id_proyecto=payload.id_proyecto).first():
+        raise HTTPException(status_code=404, detail="Proyecto no encontrado")
+    pr = Presupuesto(**payload.dict())
+    db.add(pr)
+    db.commit()
+    return payload

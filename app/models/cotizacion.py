@@ -1,12 +1,23 @@
 
-from sqlalchemy import String, Float
+from sqlalchemy import String, Numeric, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 
-class Cotizacion(Base):
-    __tablename__ = "cotizaciones"
+class Proyecto(Base):
+    __tablename__ = "proyecto"
     __table_args__ = {"schema": "cotizaciones"}
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, autoincrement=True)
-    cliente: Mapped[str] = mapped_column(String(160))
-    proyecto: Mapped[str] = mapped_column(String(160))
-    total: Mapped[float] = mapped_column(default=0.0)
+
+    id_proyecto: Mapped[str] = mapped_column(String(50), primary_key=True)
+    nombre_proyecto: Mapped[str] = mapped_column(String(150))
+    cliente: Mapped[str] = mapped_column(String(100))
+    total_proyecto: Mapped[float] = mapped_column(Numeric, default=0)
+    estado: Mapped[str | None] = mapped_column(String(30), nullable=True)
+
+class Presupuesto(Base):
+    __tablename__ = "presupuesto"
+    __table_args__ = {"schema": "cotizaciones"}
+
+    id_presupuesto: Mapped[str] = mapped_column(String(50), primary_key=True)
+    id_proyecto: Mapped[str] = mapped_column(String(50), ForeignKey("cotizaciones.proyecto.id_proyecto"))
+    nombre_presupuesto: Mapped[str] = mapped_column(String(150))
+    total_presupuesto: Mapped[float] = mapped_column(Numeric, default=0)
